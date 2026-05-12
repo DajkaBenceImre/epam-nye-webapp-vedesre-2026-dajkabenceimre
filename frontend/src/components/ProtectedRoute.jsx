@@ -6,11 +6,11 @@ const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useSelector((state) => state.auth);
 
     if (!isAuthenticated) {
-        // Ha nincs belépve, azonnal visszadobjuk a login oldalra (SPA navigációval)
+        // Ha nincs belépve, azonnal visszadobjuk a login oldalra (SPA navigáciooval)
         return <Navigate to="/login" replace />;
     }
 
-    // Ha be van lépve, megjelenítjük a kért komponenst (children)
+    // Ha be van lépve, megjelenítjük a kért komponenst (childrennel)
     return children;
 };
 
