@@ -9,15 +9,13 @@ const Dashboard = () => {
     const { showAlert } = useModal();
     const { items: transactions, status } = useSelector((state) => state.transactions);
 
-    // Aktuális dátum YYYY-MM-DD formátumban az alapértelmezett értékhez
+    // dátum YYYY-MM-DD formátumban az alapértelmezett értékhez
     const today = new Date().toISOString().split('T')[0];
 
-    // Űrlap állapota (bővítve dátummal és lekötési idővel)
     const [formData, setFormData] = useState({ 
         title: '', amount: '', type: 'expense', date: today, vaultDuration: '0.5' 
     });
 
-    // Szűrők állapota (típus és intervallum)
     const [filter, setFilter] = useState('all');
     const [dateFilter, setDateFilter] = useState({ from: '', to: '' });
 
@@ -27,7 +25,7 @@ const Dashboard = () => {
         }
     }, [status, dispatch]);
 
-    // Kamat számító függvény
+    // Kamat számító
     const calculateExpectedAmount = (amount, duration) => {
         const numAmount = Number(amount) || 0;
         if (duration === '0.5') return numAmount * 1.05; // Fél év: 5%
@@ -43,7 +41,6 @@ const Dashboard = () => {
             return;
         }
 
-        // Ha széfbe teszünk, kiszámoljuk és elküldjük a várható végösszeget is
         let payload = { ...formData };
         if (formData.type === 'vault') {
             payload.expectedAmount = calculateExpectedAmount(formData.amount, formData.vaultDuration);
@@ -58,14 +55,14 @@ const Dashboard = () => {
         }
     };
 
-    // --- Szűrési logika (Típus ÉS Dátum alapján) ---
+    // szűrés logika
     const filteredTransactions = transactions.filter(t => {
         let isValid = true;
-        // 1. Típus szűrés (a széf sose jelenjen meg a napi listában)
+        // (a széf sose jelenjen meg a napi listában)
         if (filter === 'all' && t.type === 'vault') isValid = false;
         if (filter !== 'all' && t.type !== filter) isValid = false;
 
-        // 2. Dátum szűrés
+        // Dátum szűrés
         const tDate = new Date(t.date).getTime();
         if (dateFilter.from && tDate < new Date(dateFilter.from).getTime()) isValid = false;
         if (dateFilter.to && tDate > new Date(dateFilter.to).getTime()) isValid = false;
@@ -100,7 +97,6 @@ const Dashboard = () => {
                             <option value="vault">Széf (Megtakarítás)</option>
                         </select>
 
-                        {/* Csak akkor jelenik meg, ha Széf típust választunk */}
                         {formData.type === 'vault' && (
                             <div style={{ background: '#e3f2fd', padding: '10px', borderRadius: '4px', border: '1px solid #90caf9' }}>
                                 <label style={{ display: 'block', marginBottom: '5px' }}>Lekötés időtartama:</label>
@@ -140,7 +136,6 @@ const Dashboard = () => {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <h3>Eddigi tranzakciók</h3>
                     
-                    {/* Dátum és Típus Szűrők */}
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <span>Szűrés:</span>
                         <input type="date" value={dateFilter.from} onChange={e => setDateFilter({...dateFilter, from: e.target.value})} title="Ettől" style={{ padding: '5px' }} />
